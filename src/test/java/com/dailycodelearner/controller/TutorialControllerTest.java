@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
@@ -364,6 +365,126 @@ class TutorialControllerTest {
         //then
 
         assertNull(response.getBody());
-//        assertEquals("animal",response.getBody().getTitle());
+    }
+
+    @Test
+    void shouldExecuteSuccessfullDeleteTutorial(){
+        //Given
+        long id=1;
+        Tutorial t=new Tutorial("animal","ranveer",false);
+
+        //Mock the call
+        when(tutorialRepository.findById(id)).thenReturn(Optional.of(t));
+        Mockito.doNothing().when(tutorialRepository).deleteById(id);
+
+        //when
+        ResponseEntity<Tutorial> response=tutorialController.deleteTutorial(id);
+        //then
+
+        assertNotNull(response.getBody());
+        assertEquals("animal",response.getBody().getTitle());
+    }
+
+    @Test
+    void shouldExecuteDeleteTutorialWhenObjectNotPresent(){
+        //Given
+        long id=1;
+        Tutorial t=null;
+
+        //Mock the call
+        when(tutorialRepository.findById(id)).thenReturn(Optional.ofNullable(t));
+
+        //when
+        ResponseEntity<Tutorial> response=tutorialController.deleteTutorial(id);
+
+        //then
+        assertNull(response.getBody());
+    }
+
+
+    @Test
+    void executeTitleContainingGetByTitleContainingWithoutPaginationWithSatisfyingIfCondition() {
+
+        //Given
+        List<Tutorial> tutorial = new ArrayList<>();
+        tutorial.add(new Tutorial("Spring Data Tut# 2", "Tut#2Description", true));
+        tutorial.add(new Tutorial("Spring Boot Tut# 1", "Tut#1Description", false));
+        tutorial.add(new Tutorial("Spring Cloud Tut# 5", "Tut#5Description", true));
+        tutorial.add(new Tutorial("MongoDb Database Tut# 7", "Tut#7Description", true));
+        tutorial.add(new Tutorial("Jpa Pagination Tut# 9", "Tut#9Description", false));
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "title"));
+        String s="spring";
+        //Mock the call
+        when(tutorialRepository.findByTitleContaining(s, Sort.by(orders))).thenReturn(tutorial);
+
+        //when
+        ResponseEntity<List<Tutorial>> spring = tutorialController.getByTitleContainingWithoutPagination(s, new String[]{"title,desc"});
+        //then
+
+        assertNotNull(spring.getBody());
+        assertEquals("Tut#2Description",spring.getBody().get(0).getDescription());
+
+    }
+
+    @Test
+    void executeFindAllConditionForGetByTitleContainingWithoutPaginationWithOutSatisfyingIfCondition() {
+
+        //Given
+        List<Tutorial> tutorial = new ArrayList<>();
+        tutorial.add(new Tutorial("Spring Data Tut# 2", "Tut#2Description", true));
+        tutorial.add(new Tutorial("Spring Boot Tut# 1", "Tut#1Description", false));
+        tutorial.add(new Tutorial("Spring Cloud Tut# 5", "Tut#5Description", true));
+        tutorial.add(new Tutorial("MongoDb Database Tut# 7", "Tut#7Description", true));
+        tutorial.add(new Tutorial("Jpa Pagination Tut# 9", "Tut#9Description", false));
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "title"));
+        String s="spring";
+        //Mock the call
+        when(tutorialRepository.findAll( Sort.by(orders))).thenReturn(tutorial);
+
+        //when
+        ResponseEntity<List<Tutorial>> spring = tutorialController.getByTitleContainingWithoutPagination(null, new String[]{"title", "desc"});
+        //then
+
+        assertNotNull(spring.getBody());
+        assertEquals("Tut#2Description",spring.getBody().get(0).getDescription());
+    }
+
+    @Test
+    void executeFindAllConditionForGetByTitleContainingWithoutPaginationWithOutSatisfyingIfConditionIncludingException() {
+
+        //Given
+        List<Tutorial> tutorial = new ArrayList<>();
+//        tutorial.add(new Tutorial("Spring Data Tut# 2", "Tut#2Description", true));
+
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "title"));
+
+        //Mock the call
+        when(tutorialRepository.findAll(Sort.by(orders))).thenReturn(tutorial);
+
+        //when
+
+        ResponseEntity<List<Tutorial>> spring = tutorialController.getByTitleContainingWithoutPagination(null,  new String[]{"id", "desc"});
+
+        //then
+
+        assertNull(spring.getBody());
+    }
+
+    @Test
+    void executeEmptyConditionForGetByTitleContainingWithoutPagination() {
+        //Given
+        List<Tutorial> tutorial = new ArrayList<>();
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "id"));
+        //Mock the call
+        when(tutorialRepository.findAll(Sort.by(orders))).thenThrow(new NullPointerException("this is for testing purpose only"));
+
+        //when
+        ResponseEntity<List<Tutorial>> spring = tutorialController.getByTitleContainingWithoutPagination(null, new String[]{"id", "desc"});
+        //then
+        assertNull(spring.getBody());
     }
 }
