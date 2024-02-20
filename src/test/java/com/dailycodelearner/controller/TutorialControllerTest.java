@@ -328,4 +328,42 @@ class TutorialControllerTest {
         assertEquals("animal",tutorial.getBody().getTitle());
 
     }
+
+    @Test
+    void shouldExecuteSuccessfullUpdateTutorial(){
+        //Given
+        long id=1;
+        Tutorial t=new Tutorial("animal","ranveer",false);
+
+        //Mock the call
+        when(tutorialRepository.findById(id)).thenReturn(Optional.of(t));
+        when(tutorialRepository.save(t)).thenReturn(t);
+
+        //when
+        ResponseEntity<Tutorial> response=tutorialController.updateTutorial(id,t);
+
+        //then
+
+        assertNotNull(response.getBody());
+        assertEquals("animal",response.getBody().getTitle());
+    }
+
+    @Test
+    void shouldExecuteUpdateTutorialWhenObjectNotPresent(){
+        //Given
+        long id=1;
+        Tutorial t=null;
+
+        //Mock the call
+        when(tutorialRepository.findById(id)).thenReturn(Optional.ofNullable(t));
+        when(tutorialRepository.save(t)).thenReturn(t);
+
+        //when
+        ResponseEntity<Tutorial> response=tutorialController.updateTutorial(id,t);
+
+        //then
+
+        assertNull(response.getBody());
+//        assertEquals("animal",response.getBody().getTitle());
+    }
 }

@@ -11,4 +11,10 @@ import org.springframework.data.domain.Sort;
 @SpringBootTest
 class SpringBootPaginationExample1ApplicationTests {
 
+
+    @Test
+    void context(){
+        String compare="hi";
+        Assertions.assertEquals("hi",compare);
+    }
 }
