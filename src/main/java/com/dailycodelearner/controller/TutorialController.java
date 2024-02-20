@@ -51,8 +51,7 @@ public class TutorialController {
             }
             return new ResponseEntity<>(tutorials, HttpStatus.OK);
         } catch (Exception e) {
-            ResponseEntity<List<Tutorial>> listResponseEntity = new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-            return listResponseEntity;
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -158,11 +157,12 @@ public class TutorialController {
     public ResponseEntity<Tutorial> updateTutorial(@PathVariable("id") long id,@RequestBody Tutorial tutorial){
         Optional<Tutorial> tutorial1 = tutorialRepository.findById(id);
         if(tutorial1.isPresent()){
-            Tutorial _tutorial=tutorial1.get();
-            _tutorial.setTitle(tutorial.getTitle());
-            _tutorial.setDescription(tutorial.getDescription());
-            _tutorial.setPublished(tutorial.isPublished());
-            return new ResponseEntity<>(tutorialRepository.save(_tutorial),HttpStatus.CREATED);
+            Tutorial tutorial2;
+            tutorial2 = tutorial1.get();
+            tutorial2.setTitle(tutorial.getTitle());
+            tutorial2.setDescription(tutorial.getDescription());
+            tutorial2.setPublished(tutorial.isPublished());
+            return new ResponseEntity<>(tutorialRepository.save(tutorial2),HttpStatus.CREATED);
         }
         return new ResponseEntity<>(null,HttpStatus.NO_CONTENT);
     }
